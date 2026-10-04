@@ -1,0 +1,135 @@
+[Launch]
+Trs80gpPath = ../bin/trs80gp.exe
+CommandLine = -m1 -l2 -mem 48 -dx -hx -vi
+WorkingDir = .
+AutoLaunch = 1
+CloseEmulatorOnExit = 1
+SmoothScaling = 1
+Description = TRS-80 Model I, 48K
+ShowUiAtStart = 0
+[Window]
+X = 1330
+Y = 219
+Width = 890
+Height = 843
+SettingsX = 2395
+SettingsY = 107
+SettingsWidth = 620
+SettingsHeight = 1133
+OverlayVisible = 1
+[Look]
+BezelFile = ../assets/M1.png
+ScreenLeft = 
+ScreenTop = 
+ScreenRight = 
+ScreenBottom = 
+ScreenOffsetX = 0
+ScreenOffsetY = 0
+ScreenScaleX = 100
+ScreenScaleY = 100
+BezelBrightness = 59
+ScanlineSize = 0
+Brightness = 200
+Scanlines = 1
+ScanlineOpacity = 100
+Vignette = 
+Tint = 164BE9
+TintOpacity = 100
+BlackBehind = 1
+BehindLevel = 37
+PictureOffsetX = 0
+PictureOffsetY = 0
+PictureScaleX = 100
+PictureScaleY = 100
+[Glass]
+File = ../assets/Glass.png
+Enabled = 0
+OnTop = 0
+Type = 0
+Thickness = 0.1
+Roughness = 0
+Reflectivity = 0.3
+FresnelStrength = 1.7
+AbsorptionScale = 0
+InternalReflection = 0
+Distortion = 0
+Scratches = 0
+Dust = 0
+Discolouration = 0
+BorderWidth = 0.4
+BorderHeight = 0.45
+BorderBrightness = 1.7
+BevelHighlight = 0
+GhostFalloff = 0.839
+RimSampleWidth = 0.261
+BorderTransparency = 0
+BorderTransparencyExtent = 0
+ScaleX = 0.662
+ScaleY = 0.955
+OffsetX = -0.173
+OffsetY = 0.455
+RimMirror = 1
+[Glow]
+Enabled = 1
+Curvature = 0
+ScreenRotation = 0
+CornerRadius = 0
+[Power]
+ShowRect = 0
+RectX = 77.3
+RectY = 7.1
+RectW = 2.4
+RectH = 2.1
+LineMs = 400
+DotMs = 350
+FadeMs = 300
+LineBright = 100
+DotBright = 100
+Halo = 5
+[Log]
+OutputToFile = 0
+FileName = 
+LastFileName = 
+MaxFileSize = 524288
+ShowTimeStamp = 1
+TimeFormat = HH:mm:ss.fff
+[UI]
+OpenSections = Launch,Profile
+[Frame]
+StripFrame = 1
+BlockDoubleClick = 1
+[Hotkeys]
+ToggleFrame = Ctrl+Alt+F
+ToggleOverlay = Ctrl+Alt+O
+ShowSettings = Ctrl+Alt+S
+BezelBrightnessDown = Ctrl+1
+BezelBrightnessUp = Ctrl+2
+ZoomIn = Ctrl+Oemplus
+ZoomOut = Ctrl+OemMinus
+ToggleScanlines = Alt+T
+[Scene]
+KeyLight = 0.02
+FillLight = 0.002
+SurroundEnabled = 0
+SurroundStrength = 0
+SurroundBlur = 0
+SurroundReach = 0.02
+LightBoxEnabled = 0
+LightX = -1
+LightY = -1
+LightSize = 0.02
+LightSoftness = 0
+LightIntensity = 0
+[Post]
+ExposureEV = 4
+ToneMap = 3
+Bloom = 0
+BloomRadius = 0.5
+Threshold = 0
+SoftKnee = 0
+Glare = 0
+Halation = 0
+HalationWarmth = 0
+ChromaticAberration = 0
+Dither = 0
+BlackLevel = 0

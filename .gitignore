@@ -1,0 +1,16 @@
+# Build output
+bin/
+publish/
+dist/
+src/obj/
+# Unused leftovers
+assets/M1Glass.png
+assets/M3Glass.png
+assets/M4Glass.png
+doc/
+# Third-party emulator, not redistributed (link in README)
+trs80gp.exe
+# Local settings / tooling
+*.ini
+.claude/
+GITHUB.md

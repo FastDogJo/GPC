@@ -1,0 +1,34 @@
+/* CLAUDE : new file */
+:root { --bg:#16181c; --panel:#1f2329; --fg:#d8dde4; --dim:#8a93a0; --accent:#4fc38a; --bad:#e5534b; --line:#2f353d; }
+@media (prefers-color-scheme: light) { :root { --bg:#f3f4f6; --panel:#fff; --fg:#1d2227; --dim:#68707b; --accent:#1f9d63; --line:#d5d9df; } }
+* { box-sizing:border-box; }
+body { margin:0; padding:12px 16px 24px; background:var(--bg); color:var(--fg); font:13px/1.4 "Segoe UI", sans-serif; }
+h1 { font-size:18px; margin:0 0 10px; }
+h2 { font-size:12px; text-transform:uppercase; letter-spacing:.08em; color:var(--accent); margin:0 0 8px; }
+section { background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:10px 12px; margin-bottom:10px; }
+label { display:block; margin:6px 0; color:var(--dim); }
+label.chk { color:var(--fg); }
+input[type=text], select { width:100%; padding:4px 6px; background:var(--bg); color:var(--fg); border:1px solid var(--line); border-radius:4px; }
+input[type=text].bad { border-color:var(--bad); }
+input[type=range] { width:100%; accent-color:var(--accent); }
+input[type=color] { width:48px; height:24px; padding:0; border:1px solid var(--line); background:none; vertical-align:middle; }
+output { float:right; color:var(--fg); }
+.row { display:flex; gap:6px; }
+button { padding:4px 10px; background:var(--bg); color:var(--fg); border:1px solid var(--line); border-radius:4px; cursor:pointer; }
+button:hover { border-color:var(--accent); }
+.hint { margin:4px 0 0; color:var(--dim); font-size:11px; }
+table { width:100%; border-collapse:collapse; margin-bottom:8px; }
+td { padding:2px 0; } td:first-child { color:var(--dim); width:40%; }
+
+/* CLAUDE : collapsible sections */
+header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+header h1 { margin:0; }
+.tag { font-size:11px; font-weight:normal; color:var(--accent); border:1px solid var(--line); border-radius:10px; padding:1px 8px; margin-left:6px; }
+details { background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:0 12px; margin-bottom:8px; }
+details[open] { padding-bottom:10px; }
+summary { cursor:pointer; padding:8px 0; font-size:12px; text-transform:uppercase; letter-spacing:.08em; color:var(--accent); list-style:none; user-select:none; }
+summary::-webkit-details-marker { display:none; }
+summary::before { content:"\25B8"; display:inline-block; width:14px; transition:transform .1s; }
+details[open] > summary::before { transform:rotate(90deg); }
+input[type=number] { width:100%; padding:4px 6px; background:var(--bg); color:var(--fg); border:1px solid var(--line); border-radius:4px; }
+.row2 { display:flex; gap:8px; } .row2 label { flex:1; }

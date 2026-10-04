@@ -1,0 +1,184 @@
+<!doctype html>
+<!-- CLAUDE : new file. Every control with data-key maps to one ini key (Section.Key). Sections are collapsible; the open set is saved as UI.OpenSections. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>GPC</title>
+<link rel="stylesheet" href="OverlayControls.css">
+</head>
+<body>
+<header>
+  <h1>GPC <span id="profile" class="tag">-</span></h1>
+  <span class="row"><button id="expandAll" title="Expand all sections">Expand</button><button id="collapseAll" title="Collapse all sections">Collapse</button></span>
+</header>
+
+<details data-sec="Launch">
+  <summary>Launch</summary>
+  <label>Emulator path
+    <span class="row"><input type="text" data-key="Launch.Trs80gpPath"><button id="browse">Browse</button></span>
+  </label>
+  <label>Command line <input type="text" data-key="Launch.CommandLine" placeholder="-m3 -d0 disk.dsk"></label>
+  <label>Working dir <input type="text" data-key="Launch.WorkingDir"></label>
+  <label class="chk"><input type="checkbox" data-key="Launch.AutoLaunch"> Auto-launch at start</label>
+  <label class="chk"><input type="checkbox" data-key="Launch.CloseEmulatorOnExit"> Close emulator on exit</label>
+  <label class="chk"><input type="checkbox" data-key="Launch.ShowUiAtStart"> Show this UI at startup (off : open it with the Show settings hotkey)</label>
+  <label class="chk"><input type="checkbox" data-key="Log.OutputToFile"> Enable logging (<code>&lt;preset&gt;.log</code> / <code>&lt;preset&gt;.Last.log</code> beside the preset file unless the preset overrides them)</label>
+  <label class="chk"><input type="checkbox" data-key="Launch.SmoothScaling"> Smooth picture scaling (trs80gp View - Authentic Display) so the picture follows the bezel size</label>
+  <button id="relaunch">Relaunch (kills &amp; restarts emulator)</button>
+  <p class="hint">Command line changes take effect on Relaunch.</p>
+  <label>Preset description <input type="text" data-key="Launch.Description"></label>
+  <p class="hint">Preset file : <code id="presetFile">(none)</code></p>
+  <div class="row"><button id="presetLoad">Load...</button><button id="presetSave">Save current</button><button id="presetSaveAs">Save As...</button></div>
+  <p class="hint">Load reads a .gpc file and relaunches the emulator with its command line.</p>
+</details>
+
+<details data-sec="Profile">
+  <summary>Bezel &amp; window size</summary>
+  <label>Bezel file (optional override) <input type="text" data-key="Look.BezelFile"></label>
+  <div class="row2">
+    <label>Width px <input type="number" min="100" max="20000" step="1" data-key="Window.Width"></label>
+    <label>Height px <input type="number" min="100" max="20000" step="1" data-key="Window.Height"></label>
+  </div>
+  <p class="hint">Aspect is locked to the bezel; changing one updates the other.</p>
+  <label>Bezel brightness <output></output>
+    <input type="range" min="0" max="100" data-key="Look.BezelBrightness"></label>
+  <label class="chk"><input type="checkbox" data-key="Look.BlackBehind"> Background behind the text (also fills the bezel opening around a scaled-down Screen fit)</label>
+  <label>Background level (black &rarr; dark grey ; Ctrl + mouse wheel over the bezel) <output></output>
+    <input type="range" min="0" max="100" data-key="Look.BehindLevel"></label>
+</details>
+
+<details data-sec="Look">
+  <summary>Look (brightness, scanlines, tint)</summary>
+  <label>Brightness (&gt;100 = brighten, needs GPU rendering) <output></output>
+    <input type="range" min="0" max="200" data-key="Look.Brightness"></label>
+  <label class="chk"><input type="checkbox" data-key="Look.Scanlines"> Scanlines</label>
+  <label>Scanline opacity <output></output>
+    <input type="range" min="0" max="100" data-key="Look.ScanlineOpacity"></label>
+  <label>Scanline size (px, 0 = auto) <output></output>
+    <input type="range" min="0" max="12" data-key="Look.ScanlineSize"></label>
+  <label>Vignette <output></output>
+    <input type="range" min="0" max="100" data-key="Look.Vignette"></label>
+  <label>Phosphor tint colour (GPU) <input type="color" data-key="Look.Tint" data-hex="1"></label>
+  <label>Phosphor tint amount (GPU) <output></output>
+    <input type="range" min="0" max="100" data-key="Look.TintOpacity"></label>
+</details>
+
+<details data-sec="Fit">
+  <summary>Screen fit</summary>
+  <label>X offset <output></output>
+    <input type="range" min="-400" max="400" data-key="Look.ScreenOffsetX"></label>
+  <label>Y offset <output></output>
+    <input type="range" min="-400" max="400" data-key="Look.ScreenOffsetY"></label>
+  <label>X scale % <output></output>
+    <input type="range" min="50" max="150" data-key="Look.ScreenScaleX"></label>
+  <label>Y scale % <output></output>
+    <input type="range" min="50" max="150" data-key="Look.ScreenScaleY"></label>
+  <button id="resetFit">Reset</button>
+  <p class="hint">Moves/scales the emulator picture inside the bezel opening (offsets in bezel-image pixels).</p>
+  <label>Picture X offset (GPU) <output></output>
+    <input type="range" min="-400" max="400" data-key="Look.PictureOffsetX"></label>
+  <label>Picture Y offset (GPU) <output></output>
+    <input type="range" min="-400" max="400" data-key="Look.PictureOffsetY"></label>
+  <label>Picture X scale % (GPU) <output></output>
+    <input type="range" min="50" max="300" data-key="Look.PictureScaleX"></label>
+  <label>Picture Y scale % (GPU) <output></output>
+    <input type="range" min="50" max="300" data-key="Look.PictureScaleY"></label>
+  <button id="resetPicture">Reset picture</button>
+  <p class="hint">Moves/scales the picture itself inside the opening, independent of the screen fit above. Needs Enhanced rendering ; the picture is clipped to the opening.</p>
+</details>
+
+<details data-sec="Gpu">
+  <summary>GPU rendering &amp; screen shape</summary>
+  <label class="chk"><input type="checkbox" data-key="Glow.Enabled"> Enhanced rendering (captures trs80gp; enables everything in the GPU sections)</label>
+  <label>Screen curvature <output></output>
+    <input type="range" min="0" max="100" data-key="Glow.Curvature"></label>
+  <label>Screen rotation (0.1&deg;) <output></output>
+    <input type="range" min="-150" max="150" data-key="Glow.ScreenRotation"></label>
+  <label>Corner radius % <output></output>
+    <input type="range" min="0" max="50" data-key="Glow.CornerRadius"></label>
+</details>
+
+<details data-sec="Glass">
+  <summary>Glass (GPU)</summary>
+  <label>Glass file (blank = none) <input type="text" data-key="Glass.File"></label>
+  <div class="gen" data-group="glass"></div>
+  <button id="resetGlass">Reset glass placement to auto</button>
+  <p class="hint">Port of the TRS80 project's glass shader. Scale / offset are "auto" (fit the screen) until you move them.</p>
+</details>
+
+<details data-sec="Scene">
+  <summary>Scene lighting &amp; reflections (GPU)</summary>
+  <div class="gen" data-group="scene"></div>
+</details>
+
+<details data-sec="Post">
+  <summary>Post processing (GPU)</summary>
+  <div class="gen" data-group="post"></div>
+  <p class="hint">Brightness, scanlines, vignette and phosphor tint (Look section) are applied by the GPU renderer while it is on.</p>
+</details>
+
+<details data-sec="Power">
+  <summary>Power rect</summary>
+  <label class="chk"><input type="checkbox" data-key="Power.ShowRect"> Show power rect (tuning outline)</label>
+  <label>X % <output></output>
+    <input type="range" min="0" max="100" step="0.1" data-key="Power.RectX"></label>
+  <label>Y % <output></output>
+    <input type="range" min="0" max="100" step="0.1" data-key="Power.RectY"></label>
+  <label>Width % <output></output>
+    <input type="range" min="0" max="100" step="0.1" data-key="Power.RectW"></label>
+  <label>Height % <output></output>
+    <input type="range" min="0" max="100" step="0.1" data-key="Power.RectH"></label>
+  <button id="resetPower">Clear (no power button)</button>
+  <p class="hint">Click = CRT power animation. Double-click = animation + pause (off) / cold restart (on) of the emulator. Shift + double-click quits the app. Line / dot / fade timing and brightness below drive the animation.</p>
+  <label>Power line ms <output></output>
+    <input type="range" min="0" max="2000" data-key="Power.LineMs"></label>
+  <label>Power dot ms <output></output>
+    <input type="range" min="0" max="2000" data-key="Power.DotMs"></label>
+  <label>Power fade ms <output></output>
+    <input type="range" min="0" max="3000" data-key="Power.FadeMs"></label>
+  <label>Power line brightness % <output></output>
+    <input type="range" min="0" max="100" data-key="Power.LineBright"></label>
+  <label>Power dot brightness % <output></output>
+    <input type="range" min="0" max="100" data-key="Power.DotBright"></label>
+  <label>Power halo % <output></output>
+    <input type="range" min="0" max="100" data-key="Power.Halo"></label>
+</details>
+
+<details data-sec="Frame">
+  <summary>Frame &amp; overlay</summary>
+  <label class="chk"><input type="checkbox" data-key="Frame.StripFrame"> Strip emulator caption / border / menu</label>
+  <p class="hint">Stripping the menu disables its Alt shortcuts. Use the hotkey to restore it.</p>
+  <label class="chk"><input type="checkbox" data-key="Frame.BlockDoubleClick"> Ignore double-click on the emulator (no double-click fullscreen)</label>
+  <label class="chk"><input type="checkbox" data-key="Window.OverlayVisible"> Overlay visible</label>
+</details>
+
+<details data-sec="Hotkeys">
+  <summary>Hotkeys</summary>
+  <label>Toggle frame <input type="text" data-key="Hotkeys.ToggleFrame"></label>
+  <label>Bezel brightness down <input type="text" data-key="Hotkeys.BezelBrightnessDown"></label>
+  <label>Bezel brightness up <input type="text" data-key="Hotkeys.BezelBrightnessUp"></label>
+  <label>Zoom in <input type="text" data-key="Hotkeys.ZoomIn"></label>
+  <label>Zoom out <input type="text" data-key="Hotkeys.ZoomOut"></label>
+  <label>Toggle scanlines <input type="text" data-key="Hotkeys.ToggleScanlines"></label>
+  <label>Toggle overlay <input type="text" data-key="Hotkeys.ToggleOverlay"></label>
+  <label>Show settings <input type="text" data-key="Hotkeys.ShowSettings"></label>
+  <p class="hint">Format: Ctrl+Alt+F (needs at least one of Ctrl / Alt / Shift / Win). The last five only work while the emulator / overlay has the focus; blank disables one. The mouse wheel over the bezel changes the screen brightness.</p>
+</details>
+
+<details data-sec="Status">
+  <summary>Status</summary>
+  <table id="status">
+    <tr><td>Emulator</td><td id="st-state">-</td></tr>
+    <tr><td>HWND</td><td id="st-hwnd">-</td></tr>
+    <tr><td>Emulator rect</td><td id="st-emu">-</td></tr>
+    <tr><td>Overlay rect</td><td id="st-overlay">-</td></tr>
+    <tr><td>Frame</td><td id="st-frame">-</td></tr>
+    <tr><td>Track mode</td><td id="st-mode">-</td></tr>
+    <tr><td>Syncs / sec</td><td id="st-rate">-</td></tr>
+  </table>
+  <div class="row"><button id="toggleFrame">Toggle frame</button><button id="toggleOverlay">Toggle overlay</button><button id="exit">Exit</button></div>
+</details>
+
+<script src="OverlayControls.js"></script>
+</body>
+</html>
