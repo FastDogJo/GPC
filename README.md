@@ -5,6 +5,8 @@ keeping the two windows locked together (move or resize one and the other follow
 Optional GPU rendering adds bloom, brightness above 100%, curvature, scanlines, vignette, tint and a glass cover.
 A WebView2 settings window exposes all look settings; everything is saved to a `.ini` file.
 
+![Sample](docs/Sample.png)
+
 ## Download and run
 1. Download `GPC-x.y.zip` from the [Releases](../../releases/latest) page and extract it anywhere (keep the folders together).
 2. Install the [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0) (x64) if you don't have it.
