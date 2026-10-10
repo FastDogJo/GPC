@@ -1,7 +1,7 @@
 # GPC
 
-Windows app that launches the `trs80gp` TRS-80 emulator and wraps it with a bezel overlay (Model I / III / 4 looks),
-keeping the two windows locked together (move or resize one and the other follows).
+Windows app that launches the `trs80gp` TRS-80 emulator and wraps it with a bezel overlay (Model I / II / III / 4 
+looks), keeping the two windows locked together (move or resize one and the other follows).
 Optional GPU rendering adds bloom, brightness above 100%, curvature, scanlines, vignette, tint and a glass cover.
 A WebView2 settings window exposes all look settings; they are saved to (and loaded from) `.gpc` preset files.
 
