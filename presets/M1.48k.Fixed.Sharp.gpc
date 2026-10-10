@@ -1,12 +1,14 @@
 [Launch]
 Trs80gpPath = ../bin/trs80gp.exe
-CommandLine = -m1 -l2 -mem 48 -dx -hx -vi
+CommandLine = -m1 -l2 -mem 48 -dx -hx -vi -nlc
 WorkingDir = .
 AutoLaunch = 1
 CloseEmulatorOnExit = 1
 SmoothScaling = 1
 Description = TRS-80 Model I, 48K
 ShowUiAtStart = 0
+StartMonitorOff = 0
+StartOffscreen = 1
 [Window]
 X = 1330
 Y = 219

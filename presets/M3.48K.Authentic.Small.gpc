@@ -1,19 +1,22 @@
 [Launch]
 Trs80gpPath = ../bin/trs80gp.exe
-CommandLine = -m3 -l2 -mem 48 -dx -hx -vh
+CommandLine = -m3 -l2 -mem 48 -dx -hx -va
 WorkingDir = .
 AutoLaunch = 1
 CloseEmulatorOnExit = 1
-SmoothScaling = 0
+SmoothScaling = 1
 Description = 
 ShowUiAtStart = 0
+StartMonitorOff = 1
+StartOffscreen = 1
+Volume = 8
 [Window]
-X = 1143
-Y = 300
-Width = 1299
-Height = 949
-SettingsX = 2635
-SettingsY = 293
+X = 1617
+Y = 353
+Width = 512
+Height = 374
+SettingsX = 3053
+SettingsY = 234
 SettingsWidth = 620
 SettingsHeight = 900
 OverlayVisible = 1
@@ -27,20 +30,20 @@ ScreenOffsetX = 0
 ScreenOffsetY = 0
 ScreenScaleX = 100
 ScreenScaleY = 100
-BezelBrightness = 45
+BezelBrightness = 35
 ScanlineSize = 0
-Brightness = 200
-Scanlines = 1
+Brightness = 50
+Scanlines = 0
 ScanlineOpacity = 100
 Vignette = 
 Tint = 4B73EC
 TintOpacity = 100
 BlackBehind = 1
-BehindLevel = 41
+BehindLevel = 40
 PictureOffsetX = 0
 PictureOffsetY = 0
-PictureScaleX = 100
-PictureScaleY = 100
+PictureScaleX = 92
+PictureScaleY = 95
 [Glass]
 File = ../assets/Glass.png
 Enabled = 0
@@ -94,7 +97,7 @@ MaxFileSize = 524288
 ShowTimeStamp = 1
 TimeFormat = HH:mm:ss.fff
 [UI]
-OpenSections = Launch
+OpenSections = Launch,Profile,Look,Fit,Gpu
 [Frame]
 StripFrame = 1
 BlockDoubleClick = 1
@@ -121,7 +124,7 @@ LightSize = 0.02
 LightSoftness = 0
 LightIntensity = 0
 [Post]
-ExposureEV = 1.7
+ExposureEV = 1
 ToneMap = 3
 Bloom = 0
 BloomRadius = 0.5

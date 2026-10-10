@@ -1,24 +1,27 @@
 [Launch]
 Trs80gpPath = ../bin/trs80gp.exe
-CommandLine = -m4 -l2 -mem 64 -dx -hx -va ../CAS/Dr.Fill.cas
+CommandLine = -m2 -mem 64 -va -ks -iw Date -iy %m/%d/%Y\r%h.%i.%s\rBASICG\r -iw Ready
 WorkingDir = .
 AutoLaunch = 1
 CloseEmulatorOnExit = 1
 SmoothScaling = 1
 Description = 
 ShowUiAtStart = 0
+StartMonitorOff = 1
+StartOffscreen = 1
+Volume = 8
 [Window]
-X = 1136
-Y = 238
-Width = 1400
-Height = 1071
-SettingsX = 2635
-SettingsY = 293
+X = 1486
+Y = 318
+Width = 512
+Height = 392
+SettingsX = 2602
+SettingsY = 667
 SettingsWidth = 620
 SettingsHeight = 900
 OverlayVisible = 1
 [Look]
-BezelFile = ../assets/M4.png
+BezelFile = ../assets/M2.png
 ScreenLeft = 
 ScreenTop = 
 ScreenRight = 
@@ -27,20 +30,20 @@ ScreenOffsetX = 0
 ScreenOffsetY = 0
 ScreenScaleX = 100
 ScreenScaleY = 100
-BezelBrightness = 15
+BezelBrightness = 30
 ScanlineSize = 0
-Brightness = 70
-Scanlines = 1
+Brightness = 64
+Scanlines = 0
 ScanlineOpacity = 95
 Vignette = 
 Tint = 4B73EC
 TintOpacity = 100
 BlackBehind = 1
-BehindLevel = 12
+BehindLevel = 4
 PictureOffsetX = 0
 PictureOffsetY = 0
-PictureScaleX = 94
-PictureScaleY = 107
+PictureScaleX = 89
+PictureScaleY = 86
 [Glass]
 File = ../assets/Glass.png
 Enabled = 1
@@ -64,10 +67,10 @@ GhostFalloff = 1.056
 RimSampleWidth = 0.383
 BorderTransparency = 0
 BorderTransparencyExtent = 0
-ScaleX = 0.734
-ScaleY = 0.967
-OffsetX = -0.302
-OffsetY = 0.355
+ScaleX = 0.535
+ScaleY = 0.722
+OffsetX = -0.342
+OffsetY = 0.313
 RimMirror = 1
 [Glow]
 Enabled = 1
@@ -76,10 +79,10 @@ ScreenRotation = 0
 CornerRadius = 0
 [Power]
 ShowRect = 0
-RectX = 84.5
-RectY = 72.0
-RectW = 2.4
-RectH = 2.0
+RectX = 63.5
+RectY = 37.0
+RectW = 2.7
+RectH = 10.5
 LineMs = 400
 DotMs = 350
 FadeMs = 300
@@ -94,7 +97,7 @@ MaxFileSize = 524288
 ShowTimeStamp = 1
 TimeFormat = HH:mm:ss.fff
 [UI]
-OpenSections = Launch,Profile
+OpenSections = Launch,Profile,Look,Fit
 [Frame]
 StripFrame = 1
 BlockDoubleClick = 1
@@ -133,3 +136,5 @@ HalationWarmth = 0
 ChromaticAberration = 0
 Dither = 0
 BlackLevel = 0
+[Pipe]
+Enabled = 1
