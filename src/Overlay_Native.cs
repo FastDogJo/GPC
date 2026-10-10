@@ -38,7 +38,7 @@ namespace FastDog
     public const int SW_HIDE = 0, SW_SHOWNA = 8, SW_RESTORE = 9;
     public const uint GW_HWNDNEXT = 2, GW_HWNDPREV = 3, GW_OWNER = 4;
     public const uint EVENT_SYSTEM_FOREGROUND = 0x0003, EVENT_SYSTEM_MINIMIZESTART = 0x0016, EVENT_SYSTEM_MINIMIZEEND = 0x0017;
-    public const uint EVENT_OBJECT_DESTROY = 0x8001, EVENT_OBJECT_LOCATIONCHANGE = 0x800B;
+    public const uint EVENT_OBJECT_DESTROY = 0x8001, EVENT_OBJECT_LOCATIONCHANGE = 0x800B, EVENT_OBJECT_SHOW = 0x8002, EVENT_OBJECT_CREATE = 0x8000; // CLAUDE : EVENT_OBJECT_SHOW / CREATE
     public const uint WINEVENT_OUTOFCONTEXT = 0, WINEVENT_SKIPOWNPROCESS = 2;
     public const uint ULW_ALPHA = 2;
     public const int WM_NCHITTEST = 0x84, WM_WINDOWPOSCHANGED = 0x47, WM_SIZING = 0x214, WM_MOUSEACTIVATE = 0x21, WM_HOTKEY = 0x312;
@@ -59,6 +59,7 @@ namespace FastDog
     [DllImport("user32.dll")] public static extern bool SetWindowPos(IntPtr hwnd, IntPtr after, int x, int y, int cx, int cy, uint flags);
     [DllImport("user32.dll")] public static extern IntPtr GetWindowLongPtrW(IntPtr hwnd, int index);
     [DllImport("user32.dll")] public static extern IntPtr SetWindowLongPtrW(IntPtr hwnd, int index, IntPtr value);
+    [DllImport("user32.dll")] public static extern bool SetLayeredWindowAttributes(IntPtr hwnd, uint colorKey, byte alpha, uint flags); // CLAUDE : LWA_ALPHA = 2
     [DllImport("user32.dll")] public static extern IntPtr GetMenu(IntPtr hwnd);
     [DllImport("user32.dll")] public static extern bool SetMenu(IntPtr hwnd, IntPtr menu);
     [DllImport("user32.dll")] public static extern bool DrawMenuBar(IntPtr hwnd);
@@ -93,6 +94,8 @@ namespace FastDog
     [DllImport("user32.dll")] public static extern bool DestroyMenu(IntPtr menu);
     [DllImport("user32.dll")] public static extern int TrackPopupMenu(IntPtr menu, uint flags, int x, int y, int reserved, IntPtr owner, IntPtr rect);
     [DllImport("user32.dll")] public static extern bool PostMessageW(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam);
+    [DllImport("user32.dll")] public static extern uint MapVirtualKeyW(uint code, uint mapType); // CLAUDE
+    public const int WM_KEYDOWN = 0x100, WM_KEYUP = 0x101; // CLAUDE
     // GDI32 {{{
     [DllImport("gdi32.dll")] public static extern IntPtr CreateCompatibleDC(IntPtr hdc);
     [DllImport("gdi32.dll")] public static extern IntPtr CreateDIBSection(IntPtr hdc, ref NBitmapInfoHeader bmi, uint usage, out IntPtr bits, IntPtr section, uint offset);

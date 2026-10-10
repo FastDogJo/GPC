@@ -27,9 +27,11 @@ namespace FastDog
     public static string gWorkingDir = ".";
     public static bool gAutoLaunch = true;
     public static bool gCloseEmulatorOnExit = true;
+    public static bool gStartMonitorOff = false; // CLAUDE : (re)launch with the CRT "switched off" (black screen) ; a single click in the power rect turns it on
     public static bool gShowUiAtStart = true; // CLAUDE : settings window shown at startup (otherwise only via the ShowSettings hotkey)
     public static string gDescription = ""; // CLAUDE : free text describing this preset
     public static bool gSmoothScaling = true; // CLAUDE : switch trs80gp to View -> Authentic Display (scales continuously with the window) instead of whole-number scales
+    public static int gVolume = 20; // CLAUDE : trs80gp audio volume % (-vol N), 0..100 ; applied at (re)launch, skipped when the command line already has -vol / -sv
     // [Window]  (int.MinValue = not saved yet)
     public static int gWinX = int.MinValue, gWinY = int.MinValue, gWinW = 0, gWinH = 0;
     public static int gSetX = int.MinValue, gSetY = int.MinValue, gSetW = 0, gSetH = 0;
@@ -79,6 +81,9 @@ namespace FastDog
       SBool("Launch", "ShowUiAtStart", () => gShowUiAtStart, (v) => gShowUiAtStart = v), // CLAUDE
       SStr("Launch", "Description", () => gDescription, (v) => gDescription = v), // CLAUDE
       SBool("Launch", "SmoothScaling", () => gSmoothScaling, (v) => gSmoothScaling = v),
+      SBool("Launch", "StartMonitorOff", () => gStartMonitorOff, (v) => gStartMonitorOff = v), // CLAUDE
+      SBool("Launch", "StartOffscreen", () => gStartOffscreen, (v) => gStartOffscreen = v), // CLAUDE
+      SInt("Launch", "Volume", () => gVolume, (v) => gVolume = v, int.MinValue, 0, 100), // CLAUDE
       SInt("Window", "X", () => gWinX, (v) => gWinX = v, int.MinValue, int.MinValue, int.MaxValue),
       SInt("Window", "Y", () => gWinY, (v) => gWinY = v, int.MinValue, int.MinValue, int.MaxValue),
       SInt("Window", "Width", () => gWinW, (v) => gWinW = v, 0, 0, 20000),
@@ -134,6 +139,7 @@ namespace FastDog
       SBool("Log", "ShowTimeStamp", () => WLShowTimeStamp, (v) => WLShowTimeStamp = v),
       SStr("Log", "TimeFormat", () => WLTimeFormat, (v) => WLTimeFormat = v),
       SStr("UI", "OpenSections", () => gUiOpenSections, (v) => gUiOpenSections = v),
+      SBool("Pipe", "Enabled", () => gPipeEnabled, (v) => gPipeEnabled = v), // CLAUDE
       SBool("Frame", "StripFrame", () => gStripFrame, (v) => gStripFrame = v),
       SBool("Frame", "BlockDoubleClick", () => gBlockDoubleClick, (v) => gBlockDoubleClick = v),
       SStr("Hotkeys", "ToggleFrame", () => gHotkeyToggleFrame, (v) => gHotkeyToggleFrame = v),
@@ -144,6 +150,9 @@ namespace FastDog
       SStr("Hotkeys", "ZoomIn", () => gHotkeyZoomIn, (v) => gHotkeyZoomIn = v),
       SStr("Hotkeys", "ZoomOut", () => gHotkeyZoomOut, (v) => gHotkeyZoomOut = v),
       SStr("Hotkeys", "ToggleScanlines", () => gHotkeyScanlines, (v) => gHotkeyScanlines = v),
+      SInt("Keys", "CharDelayMs", () => gKeyCharDelayMs, (v) => gKeyCharDelayMs = v, int.MinValue, 0, 60000), // CLAUDE : see Overlay_Keys.cs
+      SInt("Keys", "LineDelayMs", () => gKeyLineDelayMs, (v) => gKeyLineDelayMs = v, int.MinValue, 0, 600000),
+      SInt("Keys", "HoldMs", () => gKeyHoldMs, (v) => gKeyHoldMs = v, int.MinValue, 10, 5000),
     };
     // CLAUDE : runs after every static field initializer of every FD partial : capture defaults + classify global/profile entries
     static FD() {{{
@@ -289,6 +298,7 @@ namespace FastDog
       else if (e.Section == "Glow") { if (e.Key == "Enabled") { GlowApply(); } else { GlowLookChanged(e.Key); } } // CLAUDE : Phase 2
       else if (e.Section == "Frame") { FrameApply(); }
       else if (e.Section == "Hotkeys") { HotkeyRegisterAll(); }
+      else if (e.Section == "Pipe") { PipeApply(); } // CLAUDE
       else if ((e.Section == "Window") && (e.Key == "OverlayVisible")) { TrackApplyVisibility(); }
     }}}
   }

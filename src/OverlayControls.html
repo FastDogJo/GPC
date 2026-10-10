@@ -22,8 +22,13 @@
   <label class="chk"><input type="checkbox" data-key="Launch.AutoLaunch"> Auto-launch at start</label>
   <label class="chk"><input type="checkbox" data-key="Launch.CloseEmulatorOnExit"> Close emulator on exit</label>
   <label class="chk"><input type="checkbox" data-key="Launch.ShowUiAtStart"> Show this UI at startup (off : open it with the Show settings hotkey)</label>
+  <label class="chk"><input type="checkbox" data-key="Pipe.Enabled"> Named pipe control (<code>GPC.&lt;pid&gt;</code>, MCP-style JSON-RPC for other programs on this PC)</label>
   <label class="chk"><input type="checkbox" data-key="Log.OutputToFile"> Enable logging (<code>&lt;preset&gt;.log</code> / <code>&lt;preset&gt;.Last.log</code> beside the preset file unless the preset overrides them)</label>
   <label class="chk"><input type="checkbox" data-key="Launch.SmoothScaling"> Smooth picture scaling (trs80gp View - Authentic Display) so the picture follows the bezel size</label>
+  <label class="chk"><input type="checkbox" data-key="Launch.StartMonitorOff"> Start with the monitor off (black screen; a single click in the power rect turns it on; applies on Relaunch)</label>
+  <label class="chk"><input type="checkbox" data-key="Launch.StartOffscreen"> Start the emulator off-screen and move it under the bezel once it is set up (no visible jump; applies on Relaunch)</label>
+  <label>Audio volume % (trs80gp -vol, applied on Relaunch) <output></output>
+    <input type="range" min="0" max="100" data-key="Launch.Volume"></label>
   <button id="relaunch">Relaunch (kills &amp; restarts emulator)</button>
   <p class="hint">Command line changes take effect on Relaunch.</p>
   <label>Preset description <input type="text" data-key="Launch.Description"></label>

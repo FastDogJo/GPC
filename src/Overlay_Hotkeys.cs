@@ -1,4 +1,4 @@
-// CLAUDE : new file. Global hotkeys on a hidden message-only window ("Ctrl+Alt+F" strings from the ini).
+// CLAUDE : new file. Hotkeys on a hidden message-only window ("Ctrl+Alt+F" strings from the ini). All are registered only while this instance has the focus (see HotkeyContextUpdate).
 using System;
 using System.Windows.Forms;
 
@@ -43,28 +43,37 @@ namespace FastDog
         }
       return ((vk != 0) && (mods != 0));
     }}}
-    private static bool HotkeyRegisterOne(int id, string spec) {{{
+    private static bool HotkeyRegisterOne(int id, string spec, bool logConflict = true) {{{ // CLAUDE : logConflict
       Native.UnregisterHotKey(gHotkeyWindow!.Handle, id);
       if (!HotkeyParse(spec, out uint mods, out uint vk)) { WL($"WARNING : [Hotkey] invalid \"{spec}\"\n"); return false; }
-      if (!Native.RegisterHotKey(gHotkeyWindow.Handle, id, (mods | 0x4000), vk)) { WL($"WARNING : [Hotkey] \"{spec}\" is already in use by another app (conflict)\n"); return false; }
+      if (!Native.RegisterHotKey(gHotkeyWindow.Handle, id, (mods | 0x4000), vk)) { if (logConflict) { WL($"WARNING : [Hotkey] \"{spec}\" is already in use by another app (conflict)\n"); } return false; }
       return true;
     }}}
-    // CLAUDE : the look hotkeys only exist while the emulator / overlay has the focus (so Ctrl+1 etc. are not stolen from other apps).
+    // CLAUDE : ALL hotkeys (toggle frame / overlay, settings, look) only exist while this instance's emulator / bezel / presenter / settings window has the focus,
+    //   so several GPC instances can use the same keys and Ctrl+1 etc. are not stolen from other apps.
     private static string HotkeySpec(int id) {{{
-      switch (id) { case cHkBezelDown: return gHotkeyBezelDown; case cHkBezelUp: return gHotkeyBezelUp; case cHkZoomIn: return gHotkeyZoomIn; case cHkZoomOut: return gHotkeyZoomOut; case cHkScanlines: return gHotkeyScanlines; }
+      switch (id) { case cHkFrame: return gHotkeyToggleFrame; case cHkOverlay: return gHotkeyToggleOverlay; case cHkSettings: return gHotkeyShowSettings; case cHkBezelDown: return gHotkeyBezelDown; case cHkBezelUp: return gHotkeyBezelUp; case cHkZoomIn: return gHotkeyZoomIn; case cHkZoomOut: return gHotkeyZoomOut; case cHkScanlines: return gHotkeyScanlines; }
       return "";
     }}}
+    // CLAUDE : the foreground event reaches every GPC instance at about the same time, so the new foreground instance can try to register before the old one has let go.
+    //   A failed registration is retried on the next poll (gHkContextOn stays as it was) up to cHkRetryMax times, quietly ; the last try logs the conflict.
+    private const int cHkRetryMax = 10;
+    private static int gHkRetry = 0;
     public static void HotkeyContextUpdate() {{{
       if (gHotkeyWindow is null) { return; }
       IntPtr fg = Native.GetForegroundWindow();
-      bool inCtx = ((gEmuHwnd != IntPtr.Zero) && ((fg == gEmuHwnd) || ((gBezelForm is not null) && (fg == gBezelForm.Handle)) || ((gPresenterForm is not null) && (fg == gPresenterForm.Handle))));
+      bool inCtx = (((gEmuHwnd != IntPtr.Zero) && ((fg == gEmuHwnd) || ((gBezelForm is not null) && (fg == gBezelForm.Handle)) || ((gPresenterForm is not null) && (fg == gPresenterForm.Handle))))
+        || ((gSettingsForm is not null) && gSettingsForm.IsHandleCreated && (fg == gSettingsForm.Handle)));
       if (inCtx == gHkContextOn) { return; }
-      gHkContextOn = inCtx;
-      for (int id = cHkBezelDown; id <= cHkScanlines; id++)
+      bool failed = false;
+      for (int id = cHkFrame; id <= cHkScanlines; id++)
         {
           Native.UnregisterHotKey(gHotkeyWindow.Handle, id);
-          if (inCtx && (!string.IsNullOrWhiteSpace(HotkeySpec(id)))) { HotkeyRegisterOne(id, HotkeySpec(id)); }
+          if (inCtx && (!string.IsNullOrWhiteSpace(HotkeySpec(id)))) { if (!HotkeyRegisterOne(id, HotkeySpec(id), (gHkRetry >= cHkRetryMax))) { failed = true; } }
         }
+      if (inCtx && failed && (gHkRetry < cHkRetryMax)) { gHkRetry++; return; }
+      gHkRetry = 0;
+      gHkContextOn = inCtx;
       // Alt+<mnemonic> of the emulator's menu while its menu bar is stripped (a conflict with one of the look hotkeys above just stays unregistered)
       for (int pos = 0; pos < 32; pos++) { Native.UnregisterHotKey(gHotkeyWindow.Handle, (cHkMenuBase + pos)); }
       if (inCtx && gFrameStripped)
@@ -79,13 +88,9 @@ namespace FastDog
     }}}
     // the stripped / restored frame changed : redo the context registrations
     public static void HotkeyContextRefresh() {{{ gHkContextOn = false; HotkeyContextUpdate(); }}}
-    public static bool HotkeyRegisterAll() {{{
+    public static void HotkeyRegisterAll() {{{ // CLAUDE : void (was bool, nobody used it) ; every hotkey is a context hotkey now
       if (gHotkeyWindow is null) { gHotkeyWindow = new HotkeyWindow(); }
-      gHkContextOn = false; HotkeyContextUpdate(); // CLAUDE : re-apply the context hotkeys with the new strings
-      bool a = HotkeyRegisterOne(cHkFrame, gHotkeyToggleFrame);
-      bool b = HotkeyRegisterOne(cHkOverlay, gHotkeyToggleOverlay);
-      bool c = HotkeyRegisterOne(cHkSettings, gHotkeyShowSettings);
-      return (a && b && c);
+      gHkContextOn = false; gHkRetry = 0; HotkeyContextUpdate(); // re-apply the hotkeys with the new strings
     }}}
     public static void HotkeyShutdown() {{{
       if (gHotkeyWindow is null) { return; }

@@ -114,6 +114,7 @@ namespace FastDog
           WL($"[Preset] loaded \"{path}\"\n");
           ProfileApplyAll(oldO);
           HotkeyRegisterAll();
+          PipeApply(); // CLAUDE
           FrameApply();
           await RelaunchAsync();
           SettingsMarkClean();
@@ -130,11 +131,15 @@ namespace FastDog
     public static void PresetSaveAs() {{{
       using System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog { Filter = "GPC preset (*.gpc)|*.gpc", DefaultExt = "gpc", AddExtension = true, Title = "Save preset as", FileName = ((gIniPath is null) ? "" : Path.GetFileName(gIniPath)), InitialDirectory = IniDir() };
       if (dlg.ShowDialog(gSettingsForm) != System.Windows.Forms.DialogResult.OK) { return; }
+      PresetSaveAsFile(dlg.FileName); // CLAUDE : split out so the pipe can save without a dialog
+    }}}
+    // CLAUDE
+    public static void PresetSaveAsFile(string fileName) {{{
       NINISource = null; // the old file stays as it is; a fresh source is created for the new one
-      NINISetup(dlg.FileName);
-      SetPresetPath(dlg.FileName);
+      NINISetup(fileName);
+      SetPresetPath(fileName);
       SettingsSave();
-      WL($"[Preset] saved as \"{dlg.FileName}\"\n");
+      WL($"[Preset] saved as \"{fileName}\"\n");
       gSettingsForm?.PostInit();
     }}}
     public static void PresetLoadDialog() {{{

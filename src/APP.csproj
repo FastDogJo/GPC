@@ -51,6 +51,7 @@
 <Compile Include="Overlay_Settings.cs"><SubType>Code</SubType></Compile>
 <Compile Include="Overlay_SettingsUI.cs"><SubType>Code</SubType></Compile>
 <Compile Include="Overlay_Launch.cs"><SubType>Code</SubType></Compile>
+<Compile Include="Overlay_OffscreenStart.cs"><SubType>Code</SubType></Compile>
 <Compile Include="Overlay_Track.cs"><SubType>Code</SubType></Compile>
 <Compile Include="Overlay_Frame.cs"><SubType>Code</SubType></Compile>
 <Compile Include="Overlay_Window.cs"><SubType>Code</SubType></Compile>
@@ -59,6 +60,9 @@
 <Compile Include="Overlay_Hotkeys.cs"><SubType>Code</SubType></Compile>
 <Compile Include="Overlay_Power.cs"><SubType>Code</SubType></Compile>
 <Compile Include="Overlay_PowerAnim.cs"><SubType>Code</SubType></Compile>
+<Compile Include="Overlay_Mute.cs"><SubType>Code</SubType></Compile>
+<Compile Include="Overlay_Pipe.cs"><SubType>Code</SubType></Compile>
+<Compile Include="Overlay_Keys.cs"><SubType>Code</SubType></Compile>
 <Compile Include="Overlay_Mouse.cs"><SubType>Code</SubType></Compile>
 <Compile Include="Overlay_Profile.cs"><SubType>Code</SubType></Compile>
 <Compile Include="Overlay_P2.cs"><SubType>Code</SubType></Compile>

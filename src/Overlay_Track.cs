@@ -21,6 +21,12 @@ namespace FastDog
     public static NRect gLastE;
     public static NRect gLastO;
     public static bool gApplying = false;
+    // CLAUDE : the capture is started while the emulator is parked off-screen, so its first frame(s) are blank - the tint shader turned that into a solid tint-coloured flash.
+    //   After an off-screen start the presenter is not shown until cPresenterSettleMs after the emulator was placed (the bezel, with the plain emulator in its hole, is up meanwhile).
+    public static long gPresenterNotBefore = 0;
+    public static bool gPresenterPending = false; // CLAUDE : public : DimRenderer.Active
+    private const int cPresenterSettleMs = 200;
+    public static bool gHoldOverlay = false; // CLAUDE : true while an off-screen-started emulator is being set up : overlay windows are not shown yet
     public static bool gMinimized = false;
     public static int gSyncCount = 0;
     private static bool gShownBezel = false, gShownDim = false, gShownPresenter = false; // CLAUDE : presenter (Phase 2)
@@ -52,20 +58,34 @@ namespace FastDog
       gHooks[1] = Native.SetWinEventHook(Native.EVENT_SYSTEM_MINIMIZESTART, Native.EVENT_SYSTEM_MINIMIZEEND, IntPtr.Zero, gHookProc, pid, 0, Native.WINEVENT_OUTOFCONTEXT);
       gHooks[2] = Native.SetWinEventHook(Native.EVENT_SYSTEM_FOREGROUND, Native.EVENT_SYSTEM_FOREGROUND, IntPtr.Zero, gHookProc, 0, 0, Native.WINEVENT_OUTOFCONTEXT);
       gHooks[3] = Native.SetWinEventHook(Native.EVENT_OBJECT_DESTROY, Native.EVENT_OBJECT_DESTROY, IntPtr.Zero, gHookProc, pid, 0, Native.WINEVENT_OUTOFCONTEXT);
-      NRect e = Native.ClientScreenRect(hwnd);
+      NRect e = OffscreenStartShift(hwnd, Native.ClientScreenRect(hwnd)); // CLAUDE : started off-screen -> its natural spot
       if ((gWinW > 0) && (gWinH > 0) && (gWinX != int.MinValue) && (gWinY != int.MinValue) && BezelModel.Loaded)
         {
           NRect o = new NRect { Left = gWinX, Top = gWinY, Right = (gWinX + gWinW), Bottom = (gWinY + gWinH) };
           if (OnAnyScreen(o)) { e = BezelModel.ToClient(o); } else { WL("[Track] saved overlay rect is off-screen, ignoring\n"); }
         }
+      bool parked = OffscreenStartActive(hwnd); // CLAUDE : started off-screen : size it, start the capture etc. there, and only move it into place at the end
+      OffscreenStartReveal(hwnd); // CLAUDE : opacity back to normal while the window is still parked (before FrameStrip saves the extended style)
+      gHoldOverlay = parked; // CLAUDE : the overlay windows stay hidden until the emulator is in place (cleared below, and by OffscreenStartEnd as a safety net)
       if (gStripFrame) { FrameStrip(); }
-      if (!e.Same(Native.ClientScreenRect(hwnd))) { Native.SetClientRect(hwnd, e); }
+      if (parked) { Native.SetClientRect(hwnd, OffscreenStartPark(e)); } // CLAUDE
+      else if (!e.Same(Native.ClientScreenRect(hwnd))) { Native.SetClientRect(hwnd, e); }
       gMinimized = false;
       TrackForceLayout();
       GlowApply(); // CLAUDE : Phase 2 (no-op unless [Glow] Enabled)
       HotkeyContextUpdate(); // CLAUDE
       EmuApplySmoothScaling(); // CLAUDE : trs80gp scale follows the bezel
       gConform = true; // CLAUDE
+      if (parked) // CLAUDE : lay the (hidden) overlay windows out at the FINAL rect, put the emulator there, then show the overlay in one step
+        {
+          gLastE = e; TrackLayout();
+          WL("[Track] overlay laid out (hidden), emulator still parked\n");
+          Native.SetClientRect(hwnd, e);
+          if (!Native.ClientScreenRect(hwnd).Same(e)) { TrackForceLayout(); } // it did not get exactly e : re-fit the overlay to what it got
+          gHoldOverlay = false;
+          gPresenterNotBefore = (Environment.TickCount64 + cPresenterSettleMs); gPresenterPending = true;
+          WL("[Track] emulator placed, showing the bezel (presenter follows after the settle time)\n");
+        }
       TrackApplyVisibility();
       WL($"[Track] attached hwnd=0x{hwnd.ToInt64():X} pid={pid} client={Native.ClientScreenRect(hwnd)} overlay={gLastO}\n");
     }}}
@@ -90,6 +110,7 @@ namespace FastDog
     public static void TrackPoll() {{{
       if ((gEmuHwnd == IntPtr.Zero) || (gBezelForm is null) || gApplying || gQuitting) { return; } // CLAUDE : gQuitting
       if (!Native.IsWindow(gEmuHwnd)) { EmulatorGone(); return; }
+      if (gPresenterPending && (Environment.TickCount64 >= gPresenterNotBefore)) { gPresenterPending = false; TrackApplyVisibility(); WL("[Track] presenter shown\n"); } // CLAUDE
       bool iconic = Native.IsIconic(gEmuHwnd);
       if (iconic != gMinimized) { gMinimized = iconic; TrackApplyVisibility(); }
       if (iconic) { return; }
@@ -250,13 +271,14 @@ namespace FastDog
     }}}
     public static void TrackApplyVisibility() {{{
       if ((gBezelForm is null) || (gDimForm is null)) { return; }
-      bool show = (gOverlayVisible && (!gMinimized) && (gEmuHwnd != IntPtr.Zero));
+      bool show = (gOverlayVisible && (!gMinimized) && (gEmuHwnd != IntPtr.Zero) && (!gHoldOverlay)); // CLAUDE : gHoldOverlay
       bool sb = (show && BezelModel.Loaded);
       bool sd = (show && DimRenderer.Active);
-      if (sd != gShownDim) { Native.ShowWindow(gDimForm.Handle, (sd ? Native.SW_SHOWNA : Native.SW_HIDE)); gShownDim = sd; }
+      if (sd && (!gShownDim)) { Native.ShowWindow(gDimForm.Handle, Native.SW_SHOWNA); gShownDim = true; } // CLAUDE : show before ...
       if (sb != gShownBezel) { Native.ShowWindow(gBezelForm.Handle, (sb ? Native.SW_SHOWNA : Native.SW_HIDE)); gShownBezel = sb; }
-      bool sp = (show && GlowActive && (gPresenterForm is not null)); // CLAUDE : Phase 2 presenter
+      bool sp = (show && GlowActive && (gPresenterForm is not null) && (Environment.TickCount64 >= gPresenterNotBefore)); // CLAUDE : Phase 2 presenter (not before the settle time, see gPresenterNotBefore)
       if (sp != gShownPresenter) { Native.ShowWindow(gPresenterForm!.Handle, (sp ? Native.SW_SHOWNA : Native.SW_HIDE)); gShownPresenter = sp; }
+      if ((!sd) && gShownDim) { Native.ShowWindow(gDimForm.Handle, Native.SW_HIDE); gShownDim = false; } // CLAUDE : ... and hide after, so the picture is never uncovered between the two (presenter takes over from this overlay)
       if (sb || sd || sp) { TrackReassertZ(); }
     }}}
     public static void OverlayToggle() {{{

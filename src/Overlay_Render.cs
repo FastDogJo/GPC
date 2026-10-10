@@ -167,7 +167,11 @@ namespace FastDog
     }}}
     public void FreezeEnd() { freeze = null; }
     public static bool Active {
-      get { return ((!FD.GlowActive) && (FD.gPower.NeedsOverlay || (FD.gBrightness < 100) || (FD.gScanlines && (FD.gScanlineOpacity > 0)) || (FD.gVignette > 0) )); } // CLAUDE : Phase 2 draws these itself
+      get
+        {
+          if (FD.GlowActive) { return (FD.gPresenterPending && FD.gPower.NeedsOverlay); } // CLAUDE : GPU mode : the presenter is not up yet (settle time) -> this overlay hides the plain emulator picture while the monitor is off
+          return (FD.gPower.NeedsOverlay || (FD.gBrightness < 100) || (FD.gScanlines && (FD.gScanlineOpacity > 0)) || (FD.gVignette > 0)); // Phase 2 draws these itself
+        }
     }
     public void Resize(NRect r) {{{
       bool sizeChanged = ((surf is null) || (r.Width != rect.Width) || (r.Height != rect.Height));

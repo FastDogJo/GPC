@@ -53,6 +53,7 @@ namespace FastDog
     [System.Runtime.InteropServices.DllImport("user32.dll")] private static extern bool SetCursorPos(int x, int y);
     public static async Task LaunchAsync() {{{
       NPoint savedCursor; bool haveCursor = GetCursorPos(out savedCursor); // CLAUDE
+      if (gStartMonitorOff) { PowerSetOffNow(); } // CLAUDE : Launch.StartMonitorOff
       try
         {
           gEmuState = "launching";
@@ -62,9 +63,12 @@ namespace FastDog
           string args = (gCommandLine + (((gCommandLine.Length > 0) && (gExtraArgs.Length > 0)) ? " " : "") + gExtraArgs);
           // CLAUDE : without the GPU renderer the phosphor tint is applied by trs80gp itself (-vc), unless the command line already sets a colour
           if ((!gGlowEnabled) && System.Text.RegularExpressions.Regex.IsMatch(gTint.Trim().TrimStart('#'), "^[0-9A-Fa-f]{6}$") && (!(" " + args + " ").Contains(" -vc "))) { args += (" -vc " + gTint.Trim().TrimStart('#')); }
+          if ((!(" " + args + " ").Contains(" -vol ")) && (!(" " + args + " ").Contains(" -sv "))) { args += (" -vol " + Math.Clamp(gVolume, 0, 100)); } // CLAUDE : audio volume %
           ProcessStartInfo psi = new ProcessStartInfo { FileName = exe, Arguments = args, WorkingDirectory = (Directory.Exists(dir) ? dir : Path.GetDirectoryName(exe)!), UseShellExecute = false };
           WL($"[Launch] \"{exe}\" {psi.Arguments}\n");
-          Process p = Process.Start(psi)!;
+          OffscreenStartBegin(); // CLAUDE
+          Process p = (OffscreenStartProcess(psi) ?? Process.Start(psi)!); // CLAUDE : created off-screen (STARTF_USEPOSITION) when the setting is on
+          OffscreenStartPid((uint) p.Id); // CLAUDE
           gEmuLaunchedByUs = true;
           gLaunchedCommandLine = gCommandLine; // CLAUDE
           IntPtr h = await WaitForWindow(p, 5000);
@@ -82,6 +86,7 @@ namespace FastDog
           TrackAttach(h, (uint) p.Id);
         }
       catch (Exception ex) { WL($"ERROR : [Launch] {ex.Message}\n"); gEmuState = "launch failed"; }
+      finally { OffscreenStartEnd(); } // CLAUDE
     }}}
     // Close the emulator (kill & restart relaunch / exit path). Only closes processes we launched unless force.
     public static void EmulatorClose(bool force) {{{
@@ -99,6 +104,7 @@ namespace FastDog
     }}}
     public static async Task RelaunchAsync() {{{
       WL("[Launch] relaunch\n");
+      KeysCancel(); // CLAUDE
       TrackStop();
       GlowStop(); // CLAUDE
       gFrameStripped = false; // the old window is about to die; nothing to restore

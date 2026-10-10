@@ -39,11 +39,24 @@ namespace FastDog
     // CLAUDE : first argument (if it does not start with '-') = preset file (.gpc, Windows file association). Every other argument is appended to the trs80gp command line for this run only.
     public static void ParseArgs(string[] args) {{{
       System.Collections.Generic.List<string> rest = new System.Collections.Generic.List<string>();
-      for (int i = 0; i < args.Length; i++)
+      int i = 0; // CLAUDE
+      // CLAUDE : an unquoted preset path with spaces arrives split into several args ; rejoin the leading non-option args
+      if ((args.Length > 0) && (!args[0].StartsWith("-")))
+        {
+          System.Collections.Generic.List<string> parts = new System.Collections.Generic.List<string>();
+          // CLAUDE : stop at the first arg that completes the preset path (ends in .gpc, or the joined path exists) so a following file arg (e.g. a .cas) is not glued on
+          while ((i < args.Length) && (!args[i].StartsWith("-")))
+            {
+              parts.Add(args[i]); i++;
+              string joined = string.Join(" ", parts);
+              if ((joined.EndsWith(".gpc", StringComparison.OrdinalIgnoreCase)) || (System.IO.File.Exists(joined))) { break; }
+            }
+          gStartPreset = string.Join(" ", parts);
+        }
+      for (; i < args.Length; i++)
         {
           string a = args[i];
-          if ((i == 0) && (!a.StartsWith("-"))) { gStartPreset = a; }
-          else { rest.Add((a.Contains(' ') ? ("\"" + a + "\"") : a)); }
+          rest.Add((a.Contains(' ') ? ("\"" + a + "\"") : a));
         }
       gExtraArgs = string.Join(" ", rest);
     }}}
@@ -93,6 +106,7 @@ namespace FastDog
           gBezelRenderer!.Render();
           HotkeyRegisterAll();
           MouseHookStart(); // CLAUDE
+          PipeApply(); // CLAUDE : named pipe MCP server
           if (gAutoLaunch) { await LaunchAsync(); }
           else { gEmuState = "AutoLaunch off - press Relaunch"; }
           SettingsMarkClean(); // CLAUDE : tracking may have adjusted the window size while attaching
@@ -107,6 +121,8 @@ namespace FastDog
       try
         {
           MouseHookStop(); // CLAUDE
+          PipeStop(); // CLAUDE
+          KeysCancel(); // CLAUDE
           TrackShutdown();
           if (gCloseEmulatorOnExit && gEmuLaunchedByUs) { gFrameStripped = false; EmulatorClose(false); }
           else { FrameRestore(); }
