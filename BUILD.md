@@ -12,11 +12,17 @@ dotnet build APP.csproj -c Release
 Output goes to `..\bin\` (`GPC.exe` plus its dlls). NuGet packages (WebView2, Silk.NET) restore automatically.
 `lib\nini-core.dll` is referenced directly and is included in the repo.
 
+## Single-file exe only (fast dev cycle)
+```
+powershell -File Package.ps1 -ExeOnly
+```
+Creates `bin\single\GPC.exe` only (dist and the zip are not touched). Copy it over an installed `GPC.exe`.
+
 ## Release zip (single-file exe)
 ```
 powershell -File Package.ps1 -Version 1.0
 ```
-Creates `dist\GPC-1.0.zip` : one `bin\GPC.exe` (framework-dependent, needs the .NET 10 Desktop Runtime) plus `assets`, `presets`, `CAS`, `README.md`.
+Creates `dist\GPC-1.0.zip` : one `bin\GPC.exe` (framework-dependent, needs the .NET 10 Desktop Runtime) plus `assets`, `presets`, `programs`, `README.md`, `LICENSE`.
 The OverlayControls UI files are embedded in the exe.
 
 ## Run

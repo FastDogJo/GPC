@@ -14,3 +14,5 @@ trs80gp.exe
 *.ini
 .claude/
 GITHUB.md
+install.bat
+programs/M2/SAMPLE.dmk
